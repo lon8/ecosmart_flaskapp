@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Automate - EcoSmart Solutions, Inc.</title>
+
+    <script src="{{ url_for('static', filename='lib/axios.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/lodash.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/sweetalert2.all.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/ag-grid-community.min.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='js/grid.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/new_project_dialog.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/project_buttons.js') }}"></script>
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/lds-spinner.css') }}"/>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}"/>
+
+    <script type="text/javascript">
+        window.projectsPath = "{{ PROJECTS_FOLDER }}";
+        window.PATH_COLUMN = "{{ PATH_COLUMN }}";
+    </script>
+</head>
+<body>
+<div style="margin: 0 20px">
+    <div style="display: flex; justify-content: space-between; align-items: center">
+        <div style="display: flex;">
+            <div>
+                <div class="dropdown">
+                    <button class="dropbtn">
+                        Add Project
+                    </button>
+                    <div class="dropdown-content">
+                        <a href="#" id="newProject" target="_blank">Select Root folder</a>
+                        <a href="#" target="_blank">Select Client Folder</a>
+                        <a href="#" target="_blank">Select Project Folder</a>
+                    </div>
+
+                </div>
+                     
+                <!-- <a href="#" id="newProject" target="_blank"><img
+                        src="{{ url_for('static', filename='images/excel.png') }}" title="New Project"></a> -->
+                <!-- <div>New Project</div> -->
+                <input id="newProjectFile" type="file" style="display: none;"/>
+            </div>
+            
+            <div class="button-group audit-buttons">
+                <div class="excel-processor-button">
+                    <a href="#" id="reprocessAuditReport" target="_blank"><img
+                            src="{{ url_for('static', filename='images/excel.png') }}" title="Process Audit Report"></a>
+                    <div>Audit Process</div>
+                </div>
+
+                <div class="excel-processor-button">
+                    <a href="#" id="processAuditReportStandalone" target="_blank"><img
+                            src="{{ url_for('static', filename='images/excel.png') }}"
+                            title="Process Audit Report (standalone)"></a>
+                    <div>Audit Custom</div>
+                    <input id="auditReportFileStandalone" type="file" style="display: none;"/>
+                </div>
+
+                <div class="excel-processor-button">
+                    <a href="#" id="processAuditReportWithDefaults" target="_blank"><img
+                            src="{{ url_for('static', filename='images/excel.png') }}"
+                            title="Process Audit Report (restore defaults)"></a>
+                    <div>Audit Defaults</div>
+                </div>
+            </div>
+
+            <div class="button-group proposal-buttons">
+                <div class="excel-processor-button">
+                    <a href="#" id="createProposalPDF" target="_blank"><img src="{{
+                            url_for('static', filename='images/excel.png') }}" title="Proposal"></a>
+                    <div>Proposal</div>
+                </div>
+
+                <div class="excel-processor-button">
+                    <a href="#" id="createCustomProposal" target="_blank"><img src="{{
+                            url_for('static', filename='images/excel.png') }}" title="Custom Proposal"></a>
+                    <div>Proposal Custom</div>
+                    <input id="proposalCustomFile" type="file" style="display: none;"/>
+                </div>
+            </div>
+
+            <div class="excel-processor-button">
+                <a href="#" id="createPhotosCheckList" target="_blank"><img
+                        src="{{ url_for('static', filename='images/excel.png') }}" title="Create Photos Check List"></a>
+                <div>Photos</div>
+                <input id="photosCheckListFile" type="file" style="display: none;"/>
+            </div>
+
+            <div class="button-group scope-buttons">
+                <div class="excel-processor-button">
+                    <a href="#" id="createProjectScopePDF" target="_blank"><img
+                            src="{{ url_for('static', filename='images/excel.png') }}" title="Crete Scope PDF (project)"></a>
+                    <div>Scope Proposal</div>
+                </div>
+
+                <div class="excel-processor-button">
+                    <a href="#" id="createScopePDF" target="_blank"><img
+                            src="{{ url_for('static', filename='images/excel.png') }}" title="Crete Scope PDF (custom)"></a>
+                    <div>Scope Custom</div>
+                    <input id="scopeFile" type="file" style="display: none;"/>
+                </div>
+            </div>
+
+            <div class="excel-processor-button">
+                <a href="#" id="createCLIP" target="_blank"><img
+                        src="{{ url_for('static', filename='images/excel.png') }}" title="Crete CLIP"></a>
+                <div>CLIP</div>
+            </div>
+
+            <div class="button-group materials-buttons">
+                <div class="excel-processor-button">
+                    <a href="#" id="createMaterials" target="_blank"><img
+                            src="{{ url_for('static', filename='images/excel.png') }}" title="Create Materials"></a>
+                    <div>Materials</div>
+                </div>
+
+                <div class="excel-processor-button">
+                    <a href="#" id="createMaterialsCombined" target="_blank"><img
+                            src="{{ url_for('static', filename='images/excel.png') }}" title="Create Combined Materials"></a>
+                    <div>Materials Combined</div>
+                </div>
+            </div>
+
+            <div class="excel-processor-button">
+                <a href="#" id="createPDFLink" target="_blank">
+                    <img src="{{ url_for('static', filename='images/pdf.png') }}" alt="Disclaimer IP">
+                </a>
+                <div>Disclaimer IP</div>
+            </div>
+        </div>
+
+        <div id="dataChanged" style="font-size: 1.2em; display: none">
+            <strong>Changes were made</strong> <a href="javascript:void(0)" id="save_link">Save</a> <a
+                href="/">Cancel</a>
+        </div>
+
+        <div style="display: grid; grid-auto-flow: column; grid-gap: 10px">
+            <a id="show_hide_link" href="javascript:void(0)">Show/hide columns</a> <a id="reset_link"
+                                                                                      href="javascript:void(0)">Reset
+            columns config</a> <a href="javascript:void(0)" id="add_row_link">Add row</a>
+        </div>
+    </div>
+
+    <div id="grid" style="height: 850px; width:100%;" class="ag-theme-alpine grid"></div>
+
+    <dialog id="new-project-dialog">
+        <h3 id="new-project-dialog-title">Create New Project</h3>
+        <div class="options-section">
+            <label for="option-delay">Projects folder: &nbsp;</label>
+            <input type="text" id="projects-folder"/>
+        </div>
+
+        <div class="options-section dialog-buttons">
+            <input type="button" id="create-new-project-cancel" value="Cancel"/>
+            &nbsp;
+            <input type="button" id="create-new-project-button" value="Create"/>
+        </div>
+    </dialog>
+</div>
+
+<div id="base-loading-shim" style="display: none">
+    <div class="lds-spinner">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+    <br>
+    <!--h1 style="font-size: 40px">Saving to Excel. Don't close this page...</h1-->
+</div>
+
+</body>
+</html>
